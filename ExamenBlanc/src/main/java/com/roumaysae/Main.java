@@ -1,23 +1,34 @@
 package com.roumaysae;
 
+import com.roumaysae.containers.ContainerAgent;
 import com.roumaysae.entities.Agent;
 import com.roumaysae.entities.Transaction;
 import com.roumaysae.enums.TransactionType;
 import com.roumaysae.implementations.ScoringStrategy;
-import com.roumaysae.implementations.HistoryStrategy;
-import com.roumaysae.implementations.DefaultStrategy;
 
 import java.sql.Date;
 import java.time.LocalDate;
 
 public class Main {
     public static void main(String[] args) {
+        // Création du conteneur
+        ContainerAgent containerAgent = ContainerAgent.getInstance();
+
         // Création d'agents
         Agent agent1 = new Agent("Agent1");
         Agent agent2 = new Agent("Agent2");
         Agent agent3 = new Agent("Agent3");
 
-        // Abonnement
+        // Ajout d'agents dans le conteneur
+        containerAgent.addAgent(agent1);
+        containerAgent.addAgent(agent2);
+        containerAgent.addAgent(agent3);
+
+        // Affichage des agents enregistrés
+        System.out.println("=== Agents enregistrés dans le conteneur ===");
+        containerAgent.displayAllAgents();
+
+        // Abonnement des agents
         agent1.subscribe(agent2);
         agent1.subscribe(agent3);
 
@@ -36,30 +47,20 @@ public class Main {
                 .withType(TransactionType.Achat)
                 .build();
 
-        // Affichage de la transaction avant ajout
-        System.out.println("Transaction 1 avant ajout:");
-        System.out.println(transaction1.toString());
-
-//        // Test avec la stratégie par défaut
-//        System.out.println("\nTest avec la DefaultStrategy:");
-//        agent1.setStrategy(new DefaultStrategy());
-//        agent1.addTransaction(transaction1);  // Utilisation de la stratégie par défaut
-//        agent1.afficherTransactions();
-
-        // Test avec la stratégie ScoringStrategy (calcul du solde)
+        // Test avec la stratégie ScoringStrategy
         System.out.println("\nTest avec la ScoringStrategy:");
-        agent1.setStrategy(new ScoringStrategy()); // Changer la stratégie à ScoringStrategy
-        agent1.addTransaction(transaction2); // Ajout de la transaction pour calculer le solde
+        agent1.setStrategy(new ScoringStrategy());
+        agent1.addTransaction(transaction2);
         agent1.afficherTransactions();
 
-//        // Test avec la stratégie HistoryStrategy (garde l'historique des transactions)
-//        System.out.println("\nTest avec la HistoryStrategy:");
-//        agent1.setStrategy(new HistoryStrategy()); // Changer la stratégie à HistoryStrategy
-//        agent1.addTransaction(transaction1);  // Ajout de la transaction dans l'historique
-//        agent1.afficherTransactions();
-
         // Affichage des transactions des autres agents
+        System.out.println("\nTransactions des autres agents:");
         agent2.afficherTransactions();
         agent3.afficherTransactions();
+
+        // Suppression et affichage après suppression
+        System.out.println("\nSuppression de l'agent2...");
+        containerAgent.removeAgent("Agent2");
+        containerAgent.displayAllAgents();
     }
 }

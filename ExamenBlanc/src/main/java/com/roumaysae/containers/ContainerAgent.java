@@ -1,64 +1,60 @@
 package com.roumaysae.containers;
 
 import com.roumaysae.entities.Agent;
+import com.roumaysae.interfaces.HDMI;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class ContainerAgent {
-     // Singleton instance
-        private static ContainerAgent instance;
+    private static ContainerAgent instance;
+    private Map<String, Agent> agents;
+    private HDMI display;
 
-        // HashMap for storing agents
-        private Map<String, Agent> agents;
+    private ContainerAgent() {
+        agents = new HashMap<>();
+    }
 
-        // Private constructor
-        private ContainerAgent() {
-            agents = new HashMap<>();
+    // Singleton pattern
+    public static synchronized ContainerAgent getInstance() {
+        if (instance == null) {
+            instance = new ContainerAgent();
         }
+        return instance;
+    }
 
-        // Method to get the singleton instance
-        public static synchronized ContainerAgent getInstance() {
-            if (instance == null) {
-                instance = new ContainerAgent();
-            }
-            return instance;
-        }
+    // Configuration de l'afficheur
+    public void setDisplay(HDMI display) {
+        this.display = display;
+    }
 
-        // Add an agent to the container
-        public void addAgent(Agent agent) {
-            if (agent != null && !agents.containsKey(agent.getNom())) {
-                agents.put(agent.getNom(), agent);
-                System.out.println("Agent added: " + agent.getNom());
-            } else {
-                System.out.println("Agent already exists or is invalid.");
-            }
-        }
-
-        // Remove an agent by name
-        public void removeAgent(String name) {
-            if (agents.containsKey(name)) {
-                agents.remove(name);
-                System.out.println("Agent removed: " + name);
-            } else {
-                System.out.println("Agent not found.");
-            }
-        }
-
-        // Find an agent by name
-        public Agent findAgent(String name) {
-            return agents.get(name);
-        }
-
-        // Display all agents and their transactions
-        public void displayAllAgents() {
-            if (agents.isEmpty()) {
-                System.out.println("No agents registered.");
-            } else {
-                for (Agent agent : agents.values()) {
-                    agent.toString();
-                }
-            }
+    // Ajout d'un agent
+    public void addAgent(Agent agent) {
+        if (agent != null && !agents.containsKey(agent.getNom())) {
+            agents.put(agent.getNom(), agent);
         }
     }
 
+    // Suppression d'un agent
+    public void removeAgent(String agentName) {
+        agents.remove(agentName);
+    }
+
+    // Recherche d'un agent
+    public Agent getAgent(String agentName) {
+        return agents.get(agentName);
+    }
+
+    // Affichage de tous les agents
+    public void displayAllAgents() {
+        if (display == null) {
+            throw new IllegalStateException("Aucun afficheur HDMI connecté !");
+        }
+        if (agents.isEmpty()) {
+            display.display("Aucun agent enregistré.");
+        } else {
+            display.display("Agents enregistrés :");
+            agents.values().forEach(agent -> display.display(" - " + agent.getNom()));
+        }
+    }
+}

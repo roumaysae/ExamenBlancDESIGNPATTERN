@@ -6,6 +6,7 @@ import com.roumaysae.interfaces.Observable;
 import com.roumaysae.interfaces.Observer;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 public class Agent implements Observable, Observer {
@@ -39,15 +40,6 @@ public class Agent implements Observable, Observer {
         }
     }
 
-
-    // Ajouter une transaction et notifier
-    public void addTransaction(Transaction transaction) {
-        transactions.add(transaction);
-        notifyObservers(this.nom,transaction);
-        // Appliquer la stratégie de notification
-        strategy.handleNotification(this.nom, transaction);
-    }
-
     // Implémentation de Observer
     @Override
     public void update(String agentName, Transaction transaction) {
@@ -69,6 +61,14 @@ public class Agent implements Observable, Observer {
         this.nom = nom;
     }
 
+    // Ajouter une transaction et notifier
+    public void addTransaction(Transaction transaction) {
+        transactions.add(transaction);
+        notifyObservers(this.nom,transaction);
+        // Appliquer la stratégie de notification
+        strategy.handleNotification(this.nom, transaction);
+    }
+
     // Affichage du nom et des transactions
     public void afficherTransactions() {
         System.out.println("Agent: " + nom);
@@ -76,7 +76,12 @@ public class Agent implements Observable, Observer {
             System.out.println(t);
         }
     }
-
+    // Calculer et retourner la transaction ayant le montant le plus grand
+    public Transaction getTransactionMaxMontant() {
+        return transactions.stream()
+                .max(Comparator.comparingDouble(Transaction::getMontant))
+                .orElse(null);
+    }
     @Override
     public String toString() {
         return "Agent: " + nom + ", Transactions: " + transactions;
